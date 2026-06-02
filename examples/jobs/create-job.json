@@ -1,0 +1,17 @@
+{
+  "input": {
+    "type": "opinion",
+    "text": "企业级自动口播视频的关键不是一次生成，而是可恢复的流水线。"
+  },
+  "asset_refs": {
+    "voice_profile_id": "voice_abc",
+    "avatar_profile_id": "avatar_def",
+    "brand_kit_id": "brand_001",
+    "music_asset_id": "music_001",
+    "template_id": "template_001"
+  },
+  "output_profile": {
+    "duration_target_sec": 60,
+    "aspect_ratio": "9:16"
+  }
+}

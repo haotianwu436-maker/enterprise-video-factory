@@ -8,7 +8,52 @@ servers:
 security:
   - bearerAuth: []
 paths:
+  /v1/auth/login:
+    post:
+      summary: Authenticate a Studio user
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authenticated session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSession'
+  /v1/auth/me:
+    get:
+      summary: Get the authenticated user
+      operationId: getMe
+      responses:
+        '200':
+          description: Authenticated user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
   /v1/jobs:
+    get:
+      summary: List video generation jobs
+      operationId: listJobs
+      responses:
+        '200':
+          description: Job list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [jobs]
+                properties:
+                  jobs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Job'
     post:
       summary: Create a video generation job
       operationId: createJob
@@ -34,6 +79,19 @@ paths:
       responses:
         '200':
           description: Job state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+  /v1/jobs/{job_id}/start:
+    post:
+      summary: Start a video generation job
+      operationId: startJob
+      parameters:
+        - $ref: '#/components/parameters/jobId'
+      responses:
+        '200':
+          description: Job state after generation start
           content:
             application/json:
               schema:
@@ -384,6 +442,38 @@ components:
       schema:
         type: string
   schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    AuthSession:
+      type: object
+      required: [access_token, token_type, user]
+      properties:
+        access_token:
+          type: string
+        token_type:
+          enum: [bearer]
+        user:
+          $ref: '#/components/schemas/User'
+    User:
+      type: object
+      required: [user_id, tenant_id, email, role]
+      properties:
+        user_id:
+          type: string
+        tenant_id:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          enum: [creator, tenant_admin, reviewer, auditor]
     JobState:
       type: string
       enum: [created, validated, planning, planned, segmenting, generating_audio, generating_avatar, rendering_scenes, aligning_subtitles, mixing_audio, composing, quality_checking, repairing, review_required, publish_ready, failed, cancelled]
@@ -469,6 +559,40 @@ components:
           type: array
           items:
             type: string
+        asset_bindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetBinding'
+        progress:
+          $ref: '#/components/schemas/JobProgress'
+        state_history:
+          type: array
+          items:
+            type: string
+    JobProgress:
+      type: object
+      required: [segments_total, segments_completed, repair_attempts]
+      properties:
+        segments_total:
+          type: integer
+        segments_completed:
+          type: integer
+        repair_attempts:
+          type: integer
+    AssetBinding:
+      type: object
+      required: [request_field, asset_id, asset_type, role]
+      properties:
+        request_field:
+          type: string
+        asset_id:
+          type: string
+        asset_type:
+          enum: [voice_profile, avatar_profile, brand_kit, music_asset, template]
+        role:
+          type: string
+        authorization_snapshot:
+          type: string
     Segment:
       type: object
       required: [segment_id, job_id, state, order]
@@ -505,6 +629,8 @@ components:
           $ref: '#/components/schemas/QcStatus'
         signed_url_available:
           type: boolean
+        file_uri:
+          type: string
     QcReport:
       type: object
       required: [qc_report_id, job_id, stage, status]
@@ -523,6 +649,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FailureCode'
+        message:
+          type: string
     RepairRequest:
       type: object
       required: [scope, failure_code, requested_action, reason]
@@ -567,14 +695,20 @@ components:
       properties:
         asset_id:
           type: string
+        tenant_id:
+          type: string
         asset_type:
           enum: [voice_profile, avatar_profile, brand_kit, music_asset, template]
         state:
           $ref: '#/components/schemas/AssetState'
+        display_name:
+          type: string
         authorization_snapshots:
           type: array
           items:
             type: string
+        file_uri:
+          type: string
     AssetStateChange:
       type: object
       required: [reason]
@@ -588,6 +722,10 @@ components:
         asset_type:
           enum: [voice_profile, avatar_profile, brand_kit, music_asset, template]
         display_name:
+          type: string
+        file_name:
+          type: string
+        content_base64:
           type: string
     ConsentRequest:
       type: object

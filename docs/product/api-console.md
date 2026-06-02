@@ -44,8 +44,13 @@ This document defines the enterprise API resources and operator console workflow
 Draft endpoints:
 
 ```text
+POST   /v1/auth/login
+GET    /v1/auth/me
+
+GET    /v1/jobs
 POST   /v1/jobs
 GET    /v1/jobs/{job_id}
+POST   /v1/jobs/{job_id}/start
 GET    /v1/jobs/{job_id}/segments
 GET    /v1/jobs/{job_id}/artifacts
 GET    /v1/jobs/{job_id}/qc
@@ -68,6 +73,8 @@ POST   /v1/reviews/{review_id}/decision
 GET    /v1/artifacts/{artifact_id}/signed-url
 GET    /v1/audit/events
 ```
+
+TASK-012 local runtime implements the Studio-facing subset above: auth, asset list/create/consent/activate, job create/list/detail/start, artifacts, and QC evidence. Later runtime tasks will attach the remaining review, repair, release, signed URL, and audit endpoints to the same contract.
 
 ## Create Job Request
 
@@ -130,6 +137,8 @@ Validation:
 ## Job State Exposure
 
 API state names mirror `docs/contracts/job-state-machine.md`.
+
+`POST /v1/jobs/{job_id}/start` begins the generation pipeline for an accepted job. The runtime must return the current job state even when generation blocks. Missing model runtime configuration, such as an unset `COSYVOICE_BASE_URL`, is exposed as `state=failed`, `active_stage=tts`, and a QC report containing `model_runtime_error`; the API must not report a fake successful MP4.
 
 The console should show:
 
@@ -306,4 +315,3 @@ The initial OpenAPI file is `openapi/enterprise-video-factory.openapi.yaml`. It 
 - Whether release requires dual approval.
 - Whether public publishing integrations belong in v1.
 - Whether customer-facing API and internal operator API should be split.
-
