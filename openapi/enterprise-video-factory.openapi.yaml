@@ -1,0 +1,699 @@
+openapi: 3.1.0
+info:
+  title: Enterprise Video Factory API
+  version: 0.1.0
+  description: Draft resource model for enterprise automated talking-head video generation.
+servers:
+  - url: https://api.example.local
+security:
+  - bearerAuth: []
+paths:
+  /v1/jobs:
+    post:
+      summary: Create a video generation job
+      operationId: createJob
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJobRequest'
+      responses:
+        '202':
+          description: Job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+  /v1/jobs/{job_id}:
+    get:
+      summary: Get job state
+      operationId: getJob
+      parameters:
+        - $ref: '#/components/parameters/jobId'
+      responses:
+        '200':
+          description: Job state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+  /v1/jobs/{job_id}/segments:
+    get:
+      summary: List job segments
+      operationId: listJobSegments
+      parameters:
+        - $ref: '#/components/parameters/jobId'
+      responses:
+        '200':
+          description: Segment list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [segments]
+                properties:
+                  segments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Segment'
+  /v1/jobs/{job_id}/artifacts:
+    get:
+      summary: List job artifacts
+      operationId: listJobArtifacts
+      parameters:
+        - $ref: '#/components/parameters/jobId'
+      responses:
+        '200':
+          description: Artifact list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [artifacts]
+                properties:
+                  artifacts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Artifact'
+  /v1/jobs/{job_id}/qc:
+    get:
+      summary: List job QC reports
+      operationId: listJobQcReports
+      parameters:
+        - $ref: '#/components/parameters/jobId'
+      responses:
+        '200':
+          description: QC reports
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [qc_reports]
+                properties:
+                  qc_reports:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/QcReport'
+  /v1/jobs/{job_id}/repair:
+    post:
+      summary: Request repair for a failed job or segment
+      operationId: requestRepair
+      parameters:
+        - $ref: '#/components/parameters/jobId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepairRequest'
+      responses:
+        '202':
+          description: Repair accepted or review required
+  /v1/jobs/{job_id}/cancel:
+    post:
+      summary: Cancel a queued or running job
+      operationId: cancelJob
+      parameters:
+        - $ref: '#/components/parameters/jobId'
+      responses:
+        '202':
+          description: Cancellation requested
+  /v1/jobs/{job_id}/release:
+    post:
+      summary: Release a candidate video
+      operationId: releaseJob
+      parameters:
+        - $ref: '#/components/parameters/jobId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReleaseRequest'
+      responses:
+        '201':
+          description: Release created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Release'
+  /v1/assets:
+    get:
+      summary: List assets
+      operationId: listAssets
+      responses:
+        '200':
+          description: Asset list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [assets]
+                properties:
+                  assets:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Asset'
+    post:
+      summary: Create an asset draft
+      operationId: createAsset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAssetRequest'
+      responses:
+        '201':
+          description: Asset created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+  /v1/assets/{asset_id}:
+    get:
+      summary: Get asset state
+      operationId: getAsset
+      parameters:
+        - $ref: '#/components/parameters/assetId'
+      responses:
+        '200':
+          description: Asset state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+  /v1/assets/{asset_id}/consent:
+    post:
+      summary: Attach consent evidence to an asset
+      operationId: attachConsent
+      parameters:
+        - $ref: '#/components/parameters/assetId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentRequest'
+      responses:
+        '201':
+          description: Consent event created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentEvent'
+  /v1/assets/{asset_id}/activate:
+    post:
+      summary: Activate an authorized asset
+      operationId: activateAsset
+      parameters:
+        - $ref: '#/components/parameters/assetId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetStateChange'
+      responses:
+        '200':
+          description: Asset activated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+  /v1/assets/{asset_id}/suspend:
+    post:
+      summary: Suspend an asset
+      operationId: suspendAsset
+      parameters:
+        - $ref: '#/components/parameters/assetId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetStateChange'
+      responses:
+        '200':
+          description: Asset suspended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+  /v1/assets/{asset_id}/revoke:
+    post:
+      summary: Revoke an asset and block future use
+      operationId: revokeAsset
+      parameters:
+        - $ref: '#/components/parameters/assetId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetStateChange'
+      responses:
+        '200':
+          description: Asset revoked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+  /v1/reviews:
+    get:
+      summary: List review items
+      operationId: listReviews
+      responses:
+        '200':
+          description: Review items
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [reviews]
+                properties:
+                  reviews:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReviewItem'
+  /v1/reviews/{review_id}:
+    get:
+      summary: Get review item
+      operationId: getReview
+      parameters:
+        - name: review_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Review item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewItem'
+  /v1/reviews/{review_id}/decision:
+    post:
+      summary: Record a review decision
+      operationId: decideReview
+      parameters:
+        - name: review_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewDecision'
+      responses:
+        '200':
+          description: Decision recorded
+  /v1/artifacts/{artifact_id}/signed-url:
+    get:
+      summary: Create a signed tenant-scoped artifact URL
+      operationId: getArtifactSignedUrl
+      parameters:
+        - name: artifact_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Signed URL
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [url, expires_at]
+                properties:
+                  url:
+                    type: string
+                  expires_at:
+                    type: string
+                    format: date-time
+  /v1/audit/events:
+    get:
+      summary: List tenant-scoped audit events
+      operationId: listAuditEvents
+      parameters:
+        - name: job_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: asset_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Audit events
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [events]
+                properties:
+                  events:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuditEvent'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    jobId:
+      name: job_id
+      in: path
+      required: true
+      schema:
+        type: string
+    assetId:
+      name: asset_id
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    JobState:
+      type: string
+      enum: [created, validated, planning, planned, segmenting, generating_audio, generating_avatar, rendering_scenes, aligning_subtitles, mixing_audio, composing, quality_checking, repairing, review_required, publish_ready, failed, cancelled]
+    SegmentState:
+      type: string
+      enum: [pending, ready, audio_generating, audio_ready, avatar_generating, avatar_ready, rendering, render_ready, subtitle_aligning, subtitle_ready, composed, qc_passed, qc_failed, repairing, review_required, failed, skipped]
+    ManifestStage:
+      type: string
+      enum: [source_intake, planning, segment_input, tts, avatar, alignment, scene_render, audio_mix, composition, qc, repair, review, release]
+    QcStatus:
+      type: string
+      enum: [passed, warning, failed_repairable, review_required, failed_terminal]
+    FailureCode:
+      type: string
+      enum: [asset_not_authorized, consent_expired, tenant_scope_violation, scene_dsl_invalid, scene_dsl_prohibited_code, tts_text_too_long, voice_profile_missing, model_runtime_error, renderer_runtime_error, audio_unreadable, language_unsupported, audio_clipped, audio_silence, asr_text_mismatch, alignment_failed, avatar_profile_missing, face_not_detected, lip_sync_below_threshold, avatar_identity_drift, template_not_approved, render_blank, text_overflow, subtitle_safe_area_failed, missing_segment, duration_mismatch, codec_failed, audio_mix_failed, output_corrupt, traceability_incomplete, manual_review_required, model_license_unverified]
+    ReviewState:
+      type: string
+      enum: [opened, assigned, approved, approved_with_restrictions, rejected, escalated, closed]
+    ReviewReasonCode:
+      type: string
+      enum: [missing_consent, revoked_asset, unsafe_output, repeated_repair_failure, policy_sensitive_content, manual_operator_request]
+    ReviewDecisionValue:
+      type: string
+      enum: [approved, approved_with_restrictions, rejected, escalated]
+    ReleaseState:
+      type: string
+      enum: [candidate, approved, current, superseded, withdrawn]
+    AssetState:
+      type: string
+      enum: [draft, pending_consent, consent_verified, active, suspended, revoked, archived]
+    AuditEventType:
+      type: string
+      enum: [asset.created, asset.consent_submitted, asset.consent_approved, asset.consent_revoked, asset.activated, asset.suspended, job.created, job.assets_bound, stage.started, stage.completed, stage.failed, qc.completed, repair.requested, repair.completed, review.opened, review.approved, review.rejected, release.created, release.current_pointer_changed]
+    CreateJobRequest:
+      type: object
+      required: [input, asset_refs, output_profile]
+      properties:
+        input:
+          type: object
+          required: [type, text]
+          properties:
+            type:
+              enum: [text, article, opinion]
+            text:
+              type: string
+        asset_refs:
+          type: object
+          required: [voice_profile_id, avatar_profile_id]
+          properties:
+            voice_profile_id:
+              type: string
+            avatar_profile_id:
+              type: string
+            brand_kit_id:
+              type: string
+            music_asset_id:
+              type: string
+            template_id:
+              type: string
+        output_profile:
+          type: object
+          required: [duration_target_sec, aspect_ratio]
+          properties:
+            duration_target_sec:
+              type: integer
+              minimum: 30
+              maximum: 90
+            aspect_ratio:
+              enum: ['9:16']
+    Job:
+      type: object
+      required: [job_id, tenant_id, state]
+      properties:
+        job_id:
+          type: string
+        tenant_id:
+          type: string
+        state:
+          $ref: '#/components/schemas/JobState'
+        active_stage:
+          $ref: '#/components/schemas/ManifestStage'
+        asset_authorization_snapshots:
+          type: array
+          items:
+            type: string
+    Segment:
+      type: object
+      required: [segment_id, job_id, state, order]
+      properties:
+        segment_id:
+          type: string
+        job_id:
+          type: string
+        state:
+          $ref: '#/components/schemas/SegmentState'
+        order:
+          type: integer
+        active_stage:
+          $ref: '#/components/schemas/ManifestStage'
+        duration_sec:
+          type: number
+    Artifact:
+      type: object
+      required: [artifact_id, job_id, stage, manifest_uri]
+      properties:
+        artifact_id:
+          type: string
+        job_id:
+          type: string
+        segment_id:
+          type: string
+        stage:
+          $ref: '#/components/schemas/ManifestStage'
+        attempt:
+          type: integer
+        manifest_uri:
+          type: string
+        qc_status:
+          $ref: '#/components/schemas/QcStatus'
+        signed_url_available:
+          type: boolean
+    QcReport:
+      type: object
+      required: [qc_report_id, job_id, stage, status]
+      properties:
+        qc_report_id:
+          type: string
+        job_id:
+          type: string
+        segment_id:
+          type: string
+        stage:
+          $ref: '#/components/schemas/ManifestStage'
+        status:
+          $ref: '#/components/schemas/QcStatus'
+        failure_codes:
+          type: array
+          items:
+            $ref: '#/components/schemas/FailureCode'
+    RepairRequest:
+      type: object
+      required: [scope, failure_code, requested_action, reason]
+      properties:
+        scope:
+          enum: [job, segment]
+        segment_id:
+          type: string
+        failure_code:
+          $ref: '#/components/schemas/FailureCode'
+        requested_action:
+          type: string
+        reason:
+          type: string
+    ReleaseRequest:
+      type: object
+      required: [candidate_artifact_id, acknowledge_qc_passed, acknowledge_traceability_bundle]
+      properties:
+        candidate_artifact_id:
+          type: string
+        acknowledge_qc_passed:
+          type: boolean
+        acknowledge_traceability_bundle:
+          type: boolean
+    Release:
+      type: object
+      required: [release_id, state, final_video_uri, traceability_bundle_uri]
+      properties:
+        release_id:
+          type: string
+        state:
+          $ref: '#/components/schemas/ReleaseState'
+        final_video_uri:
+          type: string
+        traceability_bundle_uri:
+          type: string
+        current_pointer_uri:
+          type: string
+    Asset:
+      type: object
+      required: [asset_id, asset_type, state]
+      properties:
+        asset_id:
+          type: string
+        asset_type:
+          enum: [voice_profile, avatar_profile, brand_kit, music_asset, template]
+        state:
+          $ref: '#/components/schemas/AssetState'
+        authorization_snapshots:
+          type: array
+          items:
+            type: string
+    AssetStateChange:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+    CreateAssetRequest:
+      type: object
+      required: [asset_type]
+      properties:
+        asset_type:
+          enum: [voice_profile, avatar_profile, brand_kit, music_asset, template]
+        display_name:
+          type: string
+    ConsentRequest:
+      type: object
+      required: [scope, evidence_uri]
+      properties:
+        scope:
+          type: object
+        evidence_uri:
+          type: string
+    ConsentEvent:
+      type: object
+      required: [consent_event_id, asset_id, granted_at]
+      properties:
+        consent_event_id:
+          type: string
+        asset_id:
+          type: string
+        granted_at:
+          type: string
+          format: date-time
+    ReviewItem:
+      type: object
+      required: [review_id, tenant_id, job_id, state, reason_code, opened_by, opened_at, evidence_refs, decision, decided_by, decided_at]
+      properties:
+        review_id:
+          type: string
+        tenant_id:
+          type: string
+        job_id:
+          type: string
+        segment_id:
+          type: string
+        state:
+          $ref: '#/components/schemas/ReviewState'
+        reason_code:
+          $ref: '#/components/schemas/ReviewReasonCode'
+        opened_by:
+          type: string
+        opened_at:
+          type: string
+          format: date-time
+        evidence_refs:
+          type: array
+          items:
+            type: string
+        decision:
+          anyOf:
+            - $ref: '#/components/schemas/ReviewDecisionValue'
+            - type: 'null'
+        decided_by:
+          type: [string, 'null']
+        decided_at:
+          type: [string, 'null']
+          format: date-time
+    ReviewDecision:
+      type: object
+      required: [decision, reason]
+      properties:
+        decision:
+          $ref: '#/components/schemas/ReviewDecisionValue'
+        reason:
+          type: string
+        restrictions:
+          type: array
+          items:
+            type: string
+    AuditEvent:
+      type: object
+      required: [event_id, event_type, tenant_id, actor, subject, occurred_at]
+      properties:
+        event_id:
+          type: string
+        event_type:
+          $ref: '#/components/schemas/AuditEventType'
+        tenant_id:
+          type: string
+        occurred_at:
+          type: string
+          format: date-time
+        actor:
+          $ref: '#/components/schemas/AuditActor'
+        subject:
+          $ref: '#/components/schemas/AuditSubject'
+        job_id:
+          type: string
+        asset_id:
+          type: string
+        data:
+          type: object
+        trace:
+          type: object
+    AuditActor:
+      type: object
+      required: [type, id, role]
+      properties:
+        type:
+          type: string
+        id:
+          type: string
+        role:
+          type: string
+    AuditSubject:
+      type: object
+      required: [type, id]
+      properties:
+        type:
+          type: string
+        id:
+          type: string

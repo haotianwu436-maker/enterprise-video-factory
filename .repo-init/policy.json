@@ -1,0 +1,35 @@
+{
+  "mode": "greenfield",
+  "files": {
+    "README.md": {
+      "policy": "create",
+      "state": "missing",
+      "reason": "README.md does not exist."
+    },
+    "AGENT.md": {
+      "policy": "create",
+      "state": "missing",
+      "reason": "AGENT.md does not exist."
+    },
+    "PROJECT.md": {
+      "policy": "create",
+      "state": "missing",
+      "reason": "PROJECT.md does not exist."
+    },
+    "STATUS.md": {
+      "policy": "create",
+      "state": "missing",
+      "reason": "STATUS.md does not exist."
+    },
+    "DECISIONS.md": {
+      "policy": "create",
+      "state": "missing",
+      "reason": "DECISIONS.md does not exist."
+    },
+    "tasks/": {
+      "policy": "create",
+      "state": "missing",
+      "reason": "Create the tasks directory if absent; otherwise add a real task file."
+    }
+  }
+}

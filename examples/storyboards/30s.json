@@ -1,0 +1,274 @@
+{
+  "schema_version": "0.1",
+  "tenant_id": "tenant_demo",
+  "job_id": "job_30s_demo",
+  "video": {
+    "title": "AI视频生产的真正门槛",
+    "language": "zh-CN",
+    "aspect_ratio": "9:16",
+    "resolution": {
+      "width": 1080,
+      "height": 1920
+    },
+    "fps": 30,
+    "duration_target_sec": 30,
+    "style_profile": "enterprise_clear",
+    "publish_targets": ["douyin", "wechat_channels"]
+  },
+  "asset_refs": [
+    {
+      "id": "voice_primary",
+      "asset_id": "voice_demo_001",
+      "asset_type": "voice_profile",
+      "authorization_snapshot": "consent_evt_voice_001",
+      "role": "narrator"
+    },
+    {
+      "id": "avatar_primary",
+      "asset_id": "avatar_demo_001",
+      "asset_type": "avatar_profile",
+      "authorization_snapshot": "consent_evt_avatar_001",
+      "role": "speaker"
+    },
+    {
+      "id": "brand_default",
+      "asset_id": "brand_demo_001",
+      "asset_type": "brand_kit",
+      "role": "visual_identity"
+    },
+    {
+      "id": "template_default",
+      "asset_id": "template_talking_head_001",
+      "asset_type": "template",
+      "role": "scene_template"
+    },
+    {
+      "id": "music_bed",
+      "asset_id": "music_demo_001",
+      "asset_type": "music_asset",
+      "role": "background_music"
+    }
+  ],
+  "policy": {
+    "requires_authorized_identity_assets": true,
+    "manual_review_tags": [],
+    "disclosure_required": true
+  },
+  "scenes": [
+    {
+      "scene_id": "scene_001",
+      "order": 1,
+      "duration_sec": 10,
+      "script": {
+        "text": "真正降低视频生产门槛的，不是某一个模型，而是一条稳定流水线。",
+        "delivery": {
+          "tone": "confident",
+          "pace": "medium",
+          "emotion": "assured",
+          "pause_after_sec": 0.2
+        },
+        "keywords": ["视频生产", "稳定流水线"]
+      },
+      "voice": {
+        "asset_ref": "voice_primary",
+        "style": "clear_enterprise",
+        "target_lufs": -16
+      },
+      "avatar": {
+        "asset_ref": "avatar_primary",
+        "framing": "medium_close",
+        "head_motion": "natural_low",
+        "gesture_intensity": "low",
+        "eye_contact": "camera",
+        "background_mode": "template"
+      },
+      "layout": {
+        "type": "avatar_left_keywords_right",
+        "template_ref": "template_default"
+      },
+      "subtitles": {
+        "mode": "word_aligned",
+        "style": "bold_keyword",
+        "max_lines": 2,
+        "safe_area": "lower_third",
+        "burn_in": true
+      },
+      "visuals": {
+        "background": "brand_gradient_soft",
+        "emphasis": [
+          {
+            "type": "keyword_highlight",
+            "text": "稳定流水线",
+            "timing": "on_word"
+          }
+        ],
+        "safe_areas": {
+          "subtitle_bottom_pct": 18,
+          "face_protection": true
+        }
+      },
+      "music": {
+        "asset_ref": "music_bed",
+        "ducking": true,
+        "target_lufs": -20,
+        "fade_in_sec": 0.3,
+        "fade_out_sec": 0.2
+      },
+      "transitions": {
+        "in": "fade",
+        "out": "cut"
+      },
+      "qc_expectations": {
+        "requires_face_visible": true,
+        "requires_lip_sync": true,
+        "requires_subtitle_safe_area": true,
+        "manual_review_tags": []
+      }
+    },
+    {
+      "scene_id": "scene_002",
+      "order": 2,
+      "duration_sec": 10,
+      "script": {
+        "text": "文案、声音、数字人、动画、字幕和质检，必须像工厂一样分段协作。",
+        "delivery": {
+          "tone": "explanatory",
+          "pace": "medium",
+          "emotion": "focused",
+          "pause_after_sec": 0.2
+        },
+        "keywords": ["数字人", "动画", "质检"]
+      },
+      "voice": {
+        "asset_ref": "voice_primary",
+        "style": "clear_enterprise",
+        "target_lufs": -16
+      },
+      "avatar": {
+        "asset_ref": "avatar_primary",
+        "framing": "medium_close",
+        "head_motion": "natural_low",
+        "gesture_intensity": "low",
+        "eye_contact": "camera",
+        "background_mode": "template"
+      },
+      "layout": {
+        "type": "data_card_overlay",
+        "template_ref": "template_default"
+      },
+      "subtitles": {
+        "mode": "word_aligned",
+        "style": "bold_keyword",
+        "max_lines": 2,
+        "safe_area": "lower_third",
+        "burn_in": true
+      },
+      "visuals": {
+        "background": "brand_gradient_soft",
+        "emphasis": [
+          {
+            "type": "keyword_highlight",
+            "text": "分段协作",
+            "timing": "scene_mid"
+          }
+        ],
+        "safe_areas": {
+          "subtitle_bottom_pct": 18,
+          "face_protection": true
+        }
+      },
+      "music": {
+        "asset_ref": "music_bed",
+        "ducking": true,
+        "target_lufs": -20,
+        "fade_in_sec": 0,
+        "fade_out_sec": 0
+      },
+      "transitions": {
+        "in": "cut",
+        "out": "push"
+      },
+      "qc_expectations": {
+        "requires_face_visible": true,
+        "requires_lip_sync": true,
+        "requires_subtitle_safe_area": true,
+        "manual_review_tags": []
+      }
+    },
+    {
+      "scene_id": "scene_003",
+      "order": 3,
+      "duration_sec": 10,
+      "script": {
+        "text": "所以企业级系统的关键，不是一次生成成功，而是失败后能自动修复。",
+        "delivery": {
+          "tone": "conclusive",
+          "pace": "medium",
+          "emotion": "confident",
+          "pause_after_sec": 0.4
+        },
+        "keywords": ["企业级", "自动修复"]
+      },
+      "voice": {
+        "asset_ref": "voice_primary",
+        "style": "clear_enterprise",
+        "target_lufs": -16
+      },
+      "avatar": {
+        "asset_ref": "avatar_primary",
+        "framing": "medium_close",
+        "head_motion": "natural_low",
+        "gesture_intensity": "low",
+        "eye_contact": "camera",
+        "background_mode": "template"
+      },
+      "layout": {
+        "type": "quote_focus",
+        "template_ref": "template_default"
+      },
+      "subtitles": {
+        "mode": "word_aligned",
+        "style": "bold_keyword",
+        "max_lines": 2,
+        "safe_area": "lower_third",
+        "burn_in": true
+      },
+      "visuals": {
+        "background": "brand_gradient_soft",
+        "emphasis": [
+          {
+            "type": "quote_pop",
+            "text": "失败后能自动修复",
+            "timing": "scene_mid"
+          }
+        ],
+        "safe_areas": {
+          "subtitle_bottom_pct": 18,
+          "face_protection": true
+        }
+      },
+      "music": {
+        "asset_ref": "music_bed",
+        "ducking": true,
+        "target_lufs": -20,
+        "fade_in_sec": 0,
+        "fade_out_sec": 0.5
+      },
+      "transitions": {
+        "in": "push",
+        "out": "fade"
+      },
+      "qc_expectations": {
+        "requires_face_visible": true,
+        "requires_lip_sync": true,
+        "requires_subtitle_safe_area": true,
+        "manual_review_tags": []
+      }
+    }
+  ],
+  "validation_hints": {
+    "target_scene_count": 3,
+    "repair_allowed": true,
+    "max_repair_attempts": 2
+  }
+}

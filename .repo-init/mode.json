@@ -1,0 +1,12 @@
+{
+  "mode": "greenfield",
+  "reasons": [
+    "No authoritative source file or established repository content was detected."
+  ],
+  "repo_summary": {
+    "meaningful_file_count": 0,
+    "code_file_count": 0,
+    "partial_doc_count": 0,
+    "sample_files": []
+  }
+}

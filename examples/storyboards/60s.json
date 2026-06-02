@@ -1,0 +1,177 @@
+{
+  "schema_version": "0.1",
+  "tenant_id": "tenant_demo",
+  "job_id": "job_60s_demo",
+  "video": {
+    "title": "企业级自动口播视频流水线",
+    "language": "zh-CN",
+    "aspect_ratio": "9:16",
+    "resolution": {
+      "width": 1080,
+      "height": 1920
+    },
+    "fps": 30,
+    "duration_target_sec": 60,
+    "style_profile": "enterprise_clear",
+    "publish_targets": ["douyin", "xiaohongshu", "wechat_channels"]
+  },
+  "asset_refs": [
+    {
+      "id": "voice_primary",
+      "asset_id": "voice_demo_001",
+      "asset_type": "voice_profile",
+      "authorization_snapshot": "consent_evt_voice_001",
+      "role": "narrator"
+    },
+    {
+      "id": "avatar_primary",
+      "asset_id": "avatar_demo_001",
+      "asset_type": "avatar_profile",
+      "authorization_snapshot": "consent_evt_avatar_001",
+      "role": "speaker"
+    },
+    {
+      "id": "brand_default",
+      "asset_id": "brand_demo_001",
+      "asset_type": "brand_kit",
+      "role": "visual_identity"
+    },
+    {
+      "id": "template_default",
+      "asset_id": "template_talking_head_001",
+      "asset_type": "template",
+      "role": "scene_template"
+    },
+    {
+      "id": "music_bed",
+      "asset_id": "music_demo_001",
+      "asset_type": "music_asset",
+      "role": "background_music"
+    }
+  ],
+  "policy": {
+    "requires_authorized_identity_assets": true,
+    "manual_review_tags": [],
+    "disclosure_required": true
+  },
+  "scenes": [
+    {
+      "scene_id": "scene_001",
+      "order": 1,
+      "duration_sec": 10,
+      "script": {
+        "text": "企业级自动口播视频，不是把几个模型串起来那么简单。",
+        "delivery": {
+          "tone": "confident",
+          "pace": "medium",
+          "emotion": "assured",
+          "pause_after_sec": 0.2
+        },
+        "keywords": ["企业级", "自动口播视频"]
+      },
+      "voice": { "asset_ref": "voice_primary", "style": "clear_enterprise", "target_lufs": -16 },
+      "avatar": { "asset_ref": "avatar_primary", "framing": "medium_close", "head_motion": "natural_low", "gesture_intensity": "low", "eye_contact": "camera", "background_mode": "template" },
+      "layout": { "type": "avatar_center", "template_ref": "template_default" },
+      "subtitles": { "mode": "word_aligned", "style": "bold_keyword", "max_lines": 2, "safe_area": "lower_third", "burn_in": true },
+      "visuals": { "background": "brand_gradient_soft", "emphasis": [{ "type": "keyword_highlight", "text": "几个模型串起来", "timing": "scene_mid" }], "safe_areas": { "subtitle_bottom_pct": 18, "face_protection": true } },
+      "music": { "asset_ref": "music_bed", "ducking": true, "target_lufs": -20, "fade_in_sec": 0.3, "fade_out_sec": 0 },
+      "transitions": { "in": "fade", "out": "cut" },
+      "qc_expectations": { "requires_face_visible": true, "requires_lip_sync": true, "requires_subtitle_safe_area": true, "manual_review_tags": [] }
+    },
+    {
+      "scene_id": "scene_002",
+      "order": 2,
+      "duration_sec": 10,
+      "script": {
+        "text": "第一步，是把观点拆成可验证、可重试、可追踪的分段。",
+        "delivery": { "tone": "explanatory", "pace": "medium", "emotion": "focused", "pause_after_sec": 0.2 },
+        "keywords": ["可验证", "可重试", "可追踪"]
+      },
+      "voice": { "asset_ref": "voice_primary", "style": "clear_enterprise", "target_lufs": -16 },
+      "avatar": { "asset_ref": "avatar_primary", "framing": "medium_close", "head_motion": "natural_low", "gesture_intensity": "low", "eye_contact": "camera", "background_mode": "template" },
+      "layout": { "type": "data_card_overlay", "template_ref": "template_default" },
+      "subtitles": { "mode": "word_aligned", "style": "bold_keyword", "max_lines": 2, "safe_area": "lower_third", "burn_in": true },
+      "visuals": { "background": "brand_gradient_soft", "emphasis": [{ "type": "number_callout", "text": "可追踪的分段", "timing": "scene_start" }], "safe_areas": { "subtitle_bottom_pct": 18, "face_protection": true } },
+      "music": { "asset_ref": "music_bed", "ducking": true, "target_lufs": -20, "fade_in_sec": 0, "fade_out_sec": 0 },
+      "transitions": { "in": "cut", "out": "cut" },
+      "qc_expectations": { "requires_face_visible": true, "requires_lip_sync": true, "requires_subtitle_safe_area": true, "manual_review_tags": [] }
+    },
+    {
+      "scene_id": "scene_003",
+      "order": 3,
+      "duration_sec": 10,
+      "script": {
+        "text": "声音和形象都必须来自授权资产，而不是随便上传就能克隆。",
+        "delivery": { "tone": "firm", "pace": "medium", "emotion": "serious", "pause_after_sec": 0.2 },
+        "keywords": ["授权资产", "克隆"]
+      },
+      "voice": { "asset_ref": "voice_primary", "style": "clear_enterprise", "target_lufs": -16 },
+      "avatar": { "asset_ref": "avatar_primary", "framing": "medium_close", "head_motion": "natural_low", "gesture_intensity": "low", "eye_contact": "camera", "background_mode": "template" },
+      "layout": { "type": "avatar_right_quote_left", "template_ref": "template_default" },
+      "subtitles": { "mode": "word_aligned", "style": "bold_keyword", "max_lines": 2, "safe_area": "lower_third", "burn_in": true },
+      "visuals": { "background": "brand_gradient_soft", "emphasis": [{ "type": "quote_pop", "text": "授权资产", "timing": "scene_mid" }], "safe_areas": { "subtitle_bottom_pct": 18, "face_protection": true } },
+      "music": { "asset_ref": "music_bed", "ducking": true, "target_lufs": -20, "fade_in_sec": 0, "fade_out_sec": 0 },
+      "transitions": { "in": "cut", "out": "push" },
+      "qc_expectations": { "requires_face_visible": true, "requires_lip_sync": true, "requires_subtitle_safe_area": true, "manual_review_tags": [] }
+    },
+    {
+      "scene_id": "scene_004",
+      "order": 4,
+      "duration_sec": 10,
+      "script": {
+        "text": "每个模型输出都要留下版本、输入哈希、输出地址和质检证据。",
+        "delivery": { "tone": "explanatory", "pace": "medium", "emotion": "focused", "pause_after_sec": 0.2 },
+        "keywords": ["模型输出", "质检证据"]
+      },
+      "voice": { "asset_ref": "voice_primary", "style": "clear_enterprise", "target_lufs": -16 },
+      "avatar": { "asset_ref": "avatar_primary", "framing": "medium_close", "head_motion": "natural_low", "gesture_intensity": "low", "eye_contact": "camera", "background_mode": "template" },
+      "layout": { "type": "data_card_overlay", "template_ref": "template_default" },
+      "subtitles": { "mode": "word_aligned", "style": "bold_keyword", "max_lines": 2, "safe_area": "lower_third", "burn_in": true },
+      "visuals": { "background": "brand_gradient_soft", "emphasis": [{ "type": "keyword_highlight", "text": "质检证据", "timing": "scene_mid" }], "safe_areas": { "subtitle_bottom_pct": 18, "face_protection": true } },
+      "music": { "asset_ref": "music_bed", "ducking": true, "target_lufs": -20, "fade_in_sec": 0, "fade_out_sec": 0 },
+      "transitions": { "in": "push", "out": "cut" },
+      "qc_expectations": { "requires_face_visible": true, "requires_lip_sync": true, "requires_subtitle_safe_area": true, "manual_review_tags": [] }
+    },
+    {
+      "scene_id": "scene_005",
+      "order": 5,
+      "duration_sec": 10,
+      "script": {
+        "text": "失败不是异常，而是流水线的一部分；关键是局部重试和自动修复。",
+        "delivery": { "tone": "confident", "pace": "medium", "emotion": "assured", "pause_after_sec": 0.2 },
+        "keywords": ["局部重试", "自动修复"]
+      },
+      "voice": { "asset_ref": "voice_primary", "style": "clear_enterprise", "target_lufs": -16 },
+      "avatar": { "asset_ref": "avatar_primary", "framing": "medium_close", "head_motion": "natural_low", "gesture_intensity": "low", "eye_contact": "camera", "background_mode": "template" },
+      "layout": { "type": "quote_focus", "template_ref": "template_default" },
+      "subtitles": { "mode": "word_aligned", "style": "bold_keyword", "max_lines": 2, "safe_area": "lower_third", "burn_in": true },
+      "visuals": { "background": "brand_gradient_soft", "emphasis": [{ "type": "quote_pop", "text": "局部重试和自动修复", "timing": "scene_mid" }], "safe_areas": { "subtitle_bottom_pct": 18, "face_protection": true } },
+      "music": { "asset_ref": "music_bed", "ducking": true, "target_lufs": -20, "fade_in_sec": 0, "fade_out_sec": 0 },
+      "transitions": { "in": "cut", "out": "cut" },
+      "qc_expectations": { "requires_face_visible": true, "requires_lip_sync": true, "requires_subtitle_safe_area": true, "manual_review_tags": [] }
+    },
+    {
+      "scene_id": "scene_006",
+      "order": 6,
+      "duration_sec": 10,
+      "script": {
+        "text": "最后能发布的，不只是一条视频，而是一份可审计的生产记录。",
+        "delivery": { "tone": "conclusive", "pace": "medium", "emotion": "confident", "pause_after_sec": 0.4 },
+        "keywords": ["可发布", "可审计"]
+      },
+      "voice": { "asset_ref": "voice_primary", "style": "clear_enterprise", "target_lufs": -16 },
+      "avatar": { "asset_ref": "avatar_primary", "framing": "medium_close", "head_motion": "natural_low", "gesture_intensity": "low", "eye_contact": "camera", "background_mode": "template" },
+      "layout": { "type": "full_avatar_with_caption", "template_ref": "template_default" },
+      "subtitles": { "mode": "word_aligned", "style": "bold_keyword", "max_lines": 2, "safe_area": "lower_third", "burn_in": true },
+      "visuals": { "background": "brand_gradient_soft", "emphasis": [{ "type": "keyword_highlight", "text": "可审计的生产记录", "timing": "scene_mid" }], "safe_areas": { "subtitle_bottom_pct": 18, "face_protection": true } },
+      "music": { "asset_ref": "music_bed", "ducking": true, "target_lufs": -20, "fade_in_sec": 0, "fade_out_sec": 0.5 },
+      "transitions": { "in": "cut", "out": "fade" },
+      "qc_expectations": { "requires_face_visible": true, "requires_lip_sync": true, "requires_subtitle_safe_area": true, "manual_review_tags": [] }
+    }
+  ],
+  "validation_hints": {
+    "target_scene_count": 6,
+    "repair_allowed": true,
+    "max_repair_attempts": 2
+  }
+}

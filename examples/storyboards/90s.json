@@ -1,0 +1,163 @@
+{
+  "schema_version": "0.1",
+  "tenant_id": "tenant_demo",
+  "job_id": "job_90s_demo",
+  "video": {
+    "title": "从观点到成片的企业级流水线",
+    "language": "zh-CN",
+    "aspect_ratio": "9:16",
+    "resolution": {
+      "width": 1080,
+      "height": 1920
+    },
+    "fps": 30,
+    "duration_target_sec": 90,
+    "style_profile": "enterprise_clear",
+    "publish_targets": ["douyin", "xiaohongshu", "wechat_channels"]
+  },
+  "asset_refs": [
+    { "id": "voice_primary", "asset_id": "voice_demo_001", "asset_type": "voice_profile", "authorization_snapshot": "consent_evt_voice_001", "role": "narrator" },
+    { "id": "avatar_primary", "asset_id": "avatar_demo_001", "asset_type": "avatar_profile", "authorization_snapshot": "consent_evt_avatar_001", "role": "speaker" },
+    { "id": "brand_default", "asset_id": "brand_demo_001", "asset_type": "brand_kit", "role": "visual_identity" },
+    { "id": "template_default", "asset_id": "template_talking_head_001", "asset_type": "template", "role": "scene_template" },
+    { "id": "music_bed", "asset_id": "music_demo_001", "asset_type": "music_asset", "role": "background_music" }
+  ],
+  "policy": {
+    "requires_authorized_identity_assets": true,
+    "manual_review_tags": [],
+    "disclosure_required": true
+  },
+  "scenes": [
+    {
+      "scene_id": "scene_001",
+      "order": 1,
+      "duration_sec": 10,
+      "script": { "text": "未来的视频生产，会从一个观点开始，而不是从拍摄开始。", "delivery": { "tone": "confident", "pace": "medium", "emotion": "assured", "pause_after_sec": 0.2 }, "keywords": ["观点", "视频生产"] },
+      "voice": { "asset_ref": "voice_primary", "style": "clear_enterprise", "target_lufs": -16 },
+      "avatar": { "asset_ref": "avatar_primary", "framing": "medium_close", "head_motion": "natural_low", "gesture_intensity": "low", "eye_contact": "camera", "background_mode": "template" },
+      "layout": { "type": "avatar_center", "template_ref": "template_default" },
+      "subtitles": { "mode": "word_aligned", "style": "bold_keyword", "max_lines": 2, "safe_area": "lower_third", "burn_in": true },
+      "visuals": { "background": "brand_gradient_soft", "emphasis": [{ "type": "keyword_highlight", "text": "一个观点开始", "timing": "scene_mid" }], "safe_areas": { "subtitle_bottom_pct": 18, "face_protection": true } },
+      "music": { "asset_ref": "music_bed", "ducking": true, "target_lufs": -20, "fade_in_sec": 0.3, "fade_out_sec": 0 },
+      "transitions": { "in": "fade", "out": "cut" },
+      "qc_expectations": { "requires_face_visible": true, "requires_lip_sync": true, "requires_subtitle_safe_area": true, "manual_review_tags": [] }
+    },
+    {
+      "scene_id": "scene_002",
+      "order": 2,
+      "duration_sec": 10,
+      "script": { "text": "但企业级系统，不能只追求演示效果，它要追求可恢复。", "delivery": { "tone": "firm", "pace": "medium", "emotion": "serious", "pause_after_sec": 0.2 }, "keywords": ["企业级", "可恢复"] },
+      "voice": { "asset_ref": "voice_primary", "style": "clear_enterprise", "target_lufs": -16 },
+      "avatar": { "asset_ref": "avatar_primary", "framing": "medium_close", "head_motion": "natural_low", "gesture_intensity": "low", "eye_contact": "camera", "background_mode": "template" },
+      "layout": { "type": "quote_focus", "template_ref": "template_default" },
+      "subtitles": { "mode": "word_aligned", "style": "bold_keyword", "max_lines": 2, "safe_area": "lower_third", "burn_in": true },
+      "visuals": { "background": "brand_gradient_soft", "emphasis": [{ "type": "quote_pop", "text": "可恢复", "timing": "scene_mid" }], "safe_areas": { "subtitle_bottom_pct": 18, "face_protection": true } },
+      "music": { "asset_ref": "music_bed", "ducking": true, "target_lufs": -20, "fade_in_sec": 0, "fade_out_sec": 0 },
+      "transitions": { "in": "cut", "out": "cut" },
+      "qc_expectations": { "requires_face_visible": true, "requires_lip_sync": true, "requires_subtitle_safe_area": true, "manual_review_tags": [] }
+    },
+    {
+      "scene_id": "scene_003",
+      "order": 3,
+      "duration_sec": 10,
+      "script": { "text": "第一层是授权资产：声音、形象、音乐和模板，都要有来源。", "delivery": { "tone": "explanatory", "pace": "medium", "emotion": "focused", "pause_after_sec": 0.2 }, "keywords": ["授权资产", "来源"] },
+      "voice": { "asset_ref": "voice_primary", "style": "clear_enterprise", "target_lufs": -16 },
+      "avatar": { "asset_ref": "avatar_primary", "framing": "medium_close", "head_motion": "natural_low", "gesture_intensity": "low", "eye_contact": "camera", "background_mode": "template" },
+      "layout": { "type": "data_card_overlay", "template_ref": "template_default" },
+      "subtitles": { "mode": "word_aligned", "style": "bold_keyword", "max_lines": 2, "safe_area": "lower_third", "burn_in": true },
+      "visuals": { "background": "brand_gradient_soft", "emphasis": [{ "type": "number_callout", "text": "授权资产", "timing": "scene_start" }], "safe_areas": { "subtitle_bottom_pct": 18, "face_protection": true } },
+      "music": { "asset_ref": "music_bed", "ducking": true, "target_lufs": -20, "fade_in_sec": 0, "fade_out_sec": 0 },
+      "transitions": { "in": "cut", "out": "cut" },
+      "qc_expectations": { "requires_face_visible": true, "requires_lip_sync": true, "requires_subtitle_safe_area": true, "manual_review_tags": [] }
+    },
+    {
+      "scene_id": "scene_004",
+      "order": 4,
+      "duration_sec": 10,
+      "script": { "text": "第二层是结构化分镜，让大模型只写 JSON，不写任意代码。", "delivery": { "tone": "explanatory", "pace": "medium", "emotion": "focused", "pause_after_sec": 0.2 }, "keywords": ["结构化分镜", "JSON"] },
+      "voice": { "asset_ref": "voice_primary", "style": "clear_enterprise", "target_lufs": -16 },
+      "avatar": { "asset_ref": "avatar_primary", "framing": "medium_close", "head_motion": "natural_low", "gesture_intensity": "low", "eye_contact": "camera", "background_mode": "template" },
+      "layout": { "type": "avatar_left_keywords_right", "template_ref": "template_default" },
+      "subtitles": { "mode": "word_aligned", "style": "bold_keyword", "max_lines": 2, "safe_area": "lower_third", "burn_in": true },
+      "visuals": { "background": "brand_gradient_soft", "emphasis": [{ "type": "number_callout", "text": "结构化分镜", "timing": "scene_start" }], "safe_areas": { "subtitle_bottom_pct": 18, "face_protection": true } },
+      "music": { "asset_ref": "music_bed", "ducking": true, "target_lufs": -20, "fade_in_sec": 0, "fade_out_sec": 0 },
+      "transitions": { "in": "cut", "out": "push" },
+      "qc_expectations": { "requires_face_visible": true, "requires_lip_sync": true, "requires_subtitle_safe_area": true, "manual_review_tags": [] }
+    },
+    {
+      "scene_id": "scene_005",
+      "order": 5,
+      "duration_sec": 10,
+      "script": { "text": "第三层是模型适配器，把 TTS、数字人、渲染和合成都包成合同。", "delivery": { "tone": "explanatory", "pace": "medium", "emotion": "focused", "pause_after_sec": 0.2 }, "keywords": ["模型适配器", "合同"] },
+      "voice": { "asset_ref": "voice_primary", "style": "clear_enterprise", "target_lufs": -16 },
+      "avatar": { "asset_ref": "avatar_primary", "framing": "medium_close", "head_motion": "natural_low", "gesture_intensity": "low", "eye_contact": "camera", "background_mode": "template" },
+      "layout": { "type": "data_card_overlay", "template_ref": "template_default" },
+      "subtitles": { "mode": "word_aligned", "style": "bold_keyword", "max_lines": 2, "safe_area": "lower_third", "burn_in": true },
+      "visuals": { "background": "brand_gradient_soft", "emphasis": [{ "type": "number_callout", "text": "模型适配器", "timing": "scene_start" }], "safe_areas": { "subtitle_bottom_pct": 18, "face_protection": true } },
+      "music": { "asset_ref": "music_bed", "ducking": true, "target_lufs": -20, "fade_in_sec": 0, "fade_out_sec": 0 },
+      "transitions": { "in": "push", "out": "cut" },
+      "qc_expectations": { "requires_face_visible": true, "requires_lip_sync": true, "requires_subtitle_safe_area": true, "manual_review_tags": [] }
+    },
+    {
+      "scene_id": "scene_006",
+      "order": 6,
+      "duration_sec": 10,
+      "script": { "text": "第四层是编排，每个分段都能重试，不需要整条视频重跑。", "delivery": { "tone": "confident", "pace": "medium", "emotion": "assured", "pause_after_sec": 0.2 }, "keywords": ["编排", "重试"] },
+      "voice": { "asset_ref": "voice_primary", "style": "clear_enterprise", "target_lufs": -16 },
+      "avatar": { "asset_ref": "avatar_primary", "framing": "medium_close", "head_motion": "natural_low", "gesture_intensity": "low", "eye_contact": "camera", "background_mode": "template" },
+      "layout": { "type": "avatar_right_quote_left", "template_ref": "template_default" },
+      "subtitles": { "mode": "word_aligned", "style": "bold_keyword", "max_lines": 2, "safe_area": "lower_third", "burn_in": true },
+      "visuals": { "background": "brand_gradient_soft", "emphasis": [{ "type": "quote_pop", "text": "每个分段都能重试", "timing": "scene_mid" }], "safe_areas": { "subtitle_bottom_pct": 18, "face_protection": true } },
+      "music": { "asset_ref": "music_bed", "ducking": true, "target_lufs": -20, "fade_in_sec": 0, "fade_out_sec": 0 },
+      "transitions": { "in": "cut", "out": "cut" },
+      "qc_expectations": { "requires_face_visible": true, "requires_lip_sync": true, "requires_subtitle_safe_area": true, "manual_review_tags": [] }
+    },
+    {
+      "scene_id": "scene_007",
+      "order": 7,
+      "duration_sec": 10,
+      "script": { "text": "第五层是质检，黑屏、错字、唇形、授权缺失，都要被拦住。", "delivery": { "tone": "firm", "pace": "medium", "emotion": "serious", "pause_after_sec": 0.2 }, "keywords": ["质检", "授权缺失"] },
+      "voice": { "asset_ref": "voice_primary", "style": "clear_enterprise", "target_lufs": -16 },
+      "avatar": { "asset_ref": "avatar_primary", "framing": "medium_close", "head_motion": "natural_low", "gesture_intensity": "low", "eye_contact": "camera", "background_mode": "template" },
+      "layout": { "type": "data_card_overlay", "template_ref": "template_default" },
+      "subtitles": { "mode": "word_aligned", "style": "bold_keyword", "max_lines": 2, "safe_area": "lower_third", "burn_in": true },
+      "visuals": { "background": "brand_gradient_soft", "emphasis": [{ "type": "number_callout", "text": "质检", "timing": "scene_start" }], "safe_areas": { "subtitle_bottom_pct": 18, "face_protection": true } },
+      "music": { "asset_ref": "music_bed", "ducking": true, "target_lufs": -20, "fade_in_sec": 0, "fade_out_sec": 0 },
+      "transitions": { "in": "cut", "out": "push" },
+      "qc_expectations": { "requires_face_visible": true, "requires_lip_sync": true, "requires_subtitle_safe_area": true, "manual_review_tags": [] }
+    },
+    {
+      "scene_id": "scene_008",
+      "order": 8,
+      "duration_sec": 10,
+      "script": { "text": "第六层是控制台，让人能看到失败原因，而不是只看到一个进度条。", "delivery": { "tone": "explanatory", "pace": "medium", "emotion": "focused", "pause_after_sec": 0.2 }, "keywords": ["控制台", "失败原因"] },
+      "voice": { "asset_ref": "voice_primary", "style": "clear_enterprise", "target_lufs": -16 },
+      "avatar": { "asset_ref": "avatar_primary", "framing": "medium_close", "head_motion": "natural_low", "gesture_intensity": "low", "eye_contact": "camera", "background_mode": "template" },
+      "layout": { "type": "broll_insert", "template_ref": "template_default" },
+      "subtitles": { "mode": "word_aligned", "style": "bold_keyword", "max_lines": 2, "safe_area": "lower_third", "burn_in": true },
+      "visuals": { "background": "brand_gradient_soft", "emphasis": [{ "type": "keyword_highlight", "text": "失败原因", "timing": "scene_mid" }], "safe_areas": { "subtitle_bottom_pct": 18, "face_protection": true } },
+      "music": { "asset_ref": "music_bed", "ducking": true, "target_lufs": -20, "fade_in_sec": 0, "fade_out_sec": 0 },
+      "transitions": { "in": "push", "out": "cut" },
+      "qc_expectations": { "requires_face_visible": true, "requires_lip_sync": true, "requires_subtitle_safe_area": true, "manual_review_tags": [] }
+    },
+    {
+      "scene_id": "scene_009",
+      "order": 9,
+      "duration_sec": 10,
+      "script": { "text": "最后交付的，是视频，也是完整的审计链路和质量证据。", "delivery": { "tone": "conclusive", "pace": "medium", "emotion": "confident", "pause_after_sec": 0.4 }, "keywords": ["审计链路", "质量证据"] },
+      "voice": { "asset_ref": "voice_primary", "style": "clear_enterprise", "target_lufs": -16 },
+      "avatar": { "asset_ref": "avatar_primary", "framing": "medium_close", "head_motion": "natural_low", "gesture_intensity": "low", "eye_contact": "camera", "background_mode": "template" },
+      "layout": { "type": "full_avatar_with_caption", "template_ref": "template_default" },
+      "subtitles": { "mode": "word_aligned", "style": "bold_keyword", "max_lines": 2, "safe_area": "lower_third", "burn_in": true },
+      "visuals": { "background": "brand_gradient_soft", "emphasis": [{ "type": "quote_pop", "text": "审计链路和质量证据", "timing": "scene_mid" }], "safe_areas": { "subtitle_bottom_pct": 18, "face_protection": true } },
+      "music": { "asset_ref": "music_bed", "ducking": true, "target_lufs": -20, "fade_in_sec": 0, "fade_out_sec": 0.5 },
+      "transitions": { "in": "cut", "out": "fade" },
+      "qc_expectations": { "requires_face_visible": true, "requires_lip_sync": true, "requires_subtitle_safe_area": true, "manual_review_tags": [] }
+    }
+  ],
+  "validation_hints": {
+    "target_scene_count": 9,
+    "repair_allowed": true,
+    "max_repair_attempts": 2
+  }
+}

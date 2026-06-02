@@ -1,0 +1,107 @@
+{
+  "source_type": "prompt",
+  "source_path": null,
+  "detected_format": "text",
+  "extracted_text": "Initialize this repository for an enterprise-grade automated talking-head video generation platform. The product lets an authenticated user enter a short text, article, or opinion, then automatically produces a publish-ready short-form video. The system must support authorized voice profiles for zero-shot or few-shot voice cloning TTS, digital human rendering with lip sync and natural head motion, structured script and storyboard planning, HTML/Remotion-style dynamic scene animation, subtitles, background music, quality inspection, automatic repair, fallback strategies, and final MP4 rendering for vertical social video. This is not an MVP or demo; design the collaboration workspace for a production-grade, enterprise-usable system with reliability, observability, multi-tenant asset management, consent and audit logs, GPU worker orchestration, object storage, task resumability, quality gates, and model adapters that can use mostly open-source/local models with minimal third-party APIs. The architecture should favor segment-based generation, deterministic scene DSL rather than arbitrary generated code, and clear fallback paths for TTS, avatar generation, subtitle alignment, HTML rendering, and final composition. Create a coordinating master task and first-wave child tasks for architecture, model-service integration, orchestration, quality-control, product/API surface, infrastructure, and security/compliance. Stop after repository initialization; do not implement code yet.",
+  "extracted_text_path": null,
+  "title": "Initialize this repository for an enterprise-grade automated talking-head video generation platform. The product lets an",
+  "sections": [
+    "API",
+    "Integration",
+    "Auth",
+    "Sync",
+    "Storage",
+    "Service"
+  ],
+  "confidence": 0.97,
+  "warnings": [],
+  "word_count": 187,
+  "metadata": {
+    "source_count": 0,
+    "field_sources": {
+      "name": "prompt",
+      "project_type": "prompt",
+      "goal": "prompt",
+      "stack": "prompt",
+      "constraints": "prompt"
+    }
+  },
+  "provenance": {
+    "bundle_timestamp": "2026-05-29T10:01:00Z",
+    "builder": "build_source_bundle.py"
+  },
+  "sources": [],
+  "primary_source": null,
+  "source_count": 0,
+  "merged_snapshot": {
+    "name": "Initialize this repository for an enterprise-grade automated talking-head video generation platform. The product lets an",
+    "project_type": "project",
+    "stage": "",
+    "goal": "The product lets an authenticated user enter a short text, article, or opinion, then automatically produces a publish-ready short-form video",
+    "users": "",
+    "stack": [
+      "mostly open-source/local models with minimal third-party APIs. The architecture should favor segment-based generation",
+      "deterministic scene DSL rather than arbitrary generated code",
+      "clear fallback paths for TTS",
+      "avatar generation",
+      "subtitle alignment",
+      "HTML rendering",
+      "final composition. Create a coordinating master task",
+      "first-wave child tasks for architecture",
+      "model-service integration",
+      "orchestration",
+      "quality-control",
+      "product/API surface",
+      "infrastructure",
+      "security/compliance. Stop after repository initialization;"
+    ],
+    "constraints": [
+      "Use mostly open-source/local models with minimal third-party APIs. The architecture should favor segment-based generation, deterministic scene DSL rather than arbitrary generated code, clear fallback paths for TTS, avatar generation, subtitle alignment, HTML rendering, final composition. Create a coordinating master task, first-wave child tasks for architecture, model-service integration, orchestration, quality-control, product/API surface, infrastructure, security/compliance. Stop after repository initialization;."
+    ],
+    "assumptions": [
+      "Prompt order is authoritative when no primary source is explicitly identified.",
+      "Prompt order determines source priority when the user does not explicitly identify a primary file."
+    ]
+  },
+  "field_sources": {
+    "name": "prompt",
+    "project_type": "prompt",
+    "goal": "prompt",
+    "stack": "prompt",
+    "constraints": "prompt"
+  },
+  "conflicts": [],
+  "clarification_questions": [],
+  "bundle_confidence": 0.97,
+  "adopted_defaults": [],
+  "prompt_input": "Initialize this repository for an enterprise-grade automated talking-head video generation platform. The product lets an authenticated user enter a short text, article, or opinion, then automatically produces a publish-ready short-form video. The system must support authorized voice profiles for zero-shot or few-shot voice cloning TTS, digital human rendering with lip sync and natural head motion, structured script and storyboard planning, HTML/Remotion-style dynamic scene animation, subtitles, background music, quality inspection, automatic repair, fallback strategies, and final MP4 rendering for vertical social video. This is not an MVP or demo; design the collaboration workspace for a production-grade, enterprise-usable system with reliability, observability, multi-tenant asset management, consent and audit logs, GPU worker orchestration, object storage, task resumability, quality gates, and model adapters that can use mostly open-source/local models with minimal third-party APIs. The architecture should favor segment-based generation, deterministic scene DSL rather than arbitrary generated code, and clear fallback paths for TTS, avatar generation, subtitle alignment, HTML rendering, and final composition. Create a coordinating master task and first-wave child tasks for architecture, model-service integration, orchestration, quality-control, product/API surface, infrastructure, and security/compliance. Stop after repository initialization; do not implement code yet.",
+  "source_roles": [],
+  "complexity_assessment": {
+    "level": "complex",
+    "score": 6,
+    "signals": [
+      "len(sections)>=6",
+      "len(merged_snapshot.stack)>=3",
+      "enterprise_grade_non_mvp_target",
+      "first_wave_task_families>=8",
+      "quality_fallback_governance_requirements",
+      "governance_split_required"
+    ]
+  },
+  "task_decomposition": {
+    "applied": true,
+    "reason": "Post-init audit correction: user clarified enterprise-grade target, so the generic bootstrap task was replaced with a coordinating task and first-wave child tasks; route review split governance baseline from final compliance completion.",
+    "master_task": "TASK-001-coordinate-enterprise-delivery-plan.md",
+    "child_tasks": [
+      "TASK-002-lock-production-architecture.md",
+      "TASK-008-design-governance-baseline-and-authorized-assets.md",
+      "TASK-003-define-scene-dsl-and-planning-contract.md",
+      "TASK-004-design-model-service-adapters.md",
+      "TASK-005-design-orchestration-and-gpu-workers.md",
+      "TASK-006-design-quality-gates-and-auto-repair.md",
+      "TASK-007-design-product-api-and-console.md",
+      "TASK-009-complete-compliance-checklist-and-risk-register.md"
+    ],
+    "recommended_start_task": "TASK-002-lock-production-architecture.md"
+  }
+}
