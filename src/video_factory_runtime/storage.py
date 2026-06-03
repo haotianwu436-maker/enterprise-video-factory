@@ -238,8 +238,11 @@ class SQLiteRuntimeStore(AssetRepository, JobRepository):
                 "update assets set state = ?, updated_at = ? where tenant_id = ? and asset_id = ?",
                 ("active", _now(), tenant_id, asset_id),
             )
-        fresh = self.get_asset(tenant_id, asset_id)
-        return asset_to_api(fresh) if fresh else {}
+            row = conn.execute(
+                "select * from assets where tenant_id = ? and asset_id = ?",
+                (tenant_id, asset_id),
+            ).fetchone()
+        return _asset_api(row) if row else {}
 
     def next_job_id(self) -> str:
         return f"job_{self._next_counter('job'):06d}"

@@ -48,6 +48,8 @@ export type ArtifactSignedUrl = {
   expires_at: string;
 };
 
+export type AssetSignedUrl = ArtifactSignedUrl;
+
 export type CopywriterQuestion = {
   id: string;
   label: string;
@@ -129,7 +131,7 @@ export async function fileToBase64(file: File): Promise<string> {
 }
 
 export function buildCreateJobPayload(text: string, assets: Asset[]) {
-  const byType = Object.fromEntries(assets.filter((asset) => asset.state === "active").map((asset) => [asset.asset_type, asset]));
+  const byType = firstActiveAssetByType(assets);
   return {
     input: { type: "opinion", text },
     asset_refs: {
@@ -141,6 +143,30 @@ export function buildCreateJobPayload(text: string, assets: Asset[]) {
     },
     output_profile: { duration_target_sec: 60, aspect_ratio: "9:16" }
   };
+}
+
+export function firstActiveAssetByType(assets: Asset[]): Record<string, Asset> {
+  return assets.filter((asset) => asset.state === "active").reduce<Record<string, Asset>>((selected, asset) => {
+    if (!selected[asset.asset_type]) {
+      selected[asset.asset_type] = asset;
+    }
+    return selected;
+  }, {});
+}
+
+export async function buildAssetPreviewUrls(assets: Asset[], token: string): Promise<Record<string, string>> {
+  const previewable = assets.filter((asset) => asset.file_uri && /\.(jpe?g|png)$/i.test(asset.file_uri));
+  const entries = await Promise.all(
+    previewable.map(async (asset) => {
+      try {
+        const signed = await apiGet<AssetSignedUrl>(`/v1/assets/${asset.asset_id}/signed-url`, token);
+        return [asset.asset_id, signed.url] as const;
+      } catch {
+        return [asset.asset_id, ""] as const;
+      }
+    })
+  );
+  return Object.fromEntries(entries.filter(([, url]) => Boolean(url)));
 }
 
 function authHeaders(token: string) {

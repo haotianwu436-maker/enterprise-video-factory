@@ -270,6 +270,77 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Asset'
+  /v1/assets/{asset_id}/signed-url:
+    get:
+      summary: Create a signed tenant-scoped asset media URL
+      operationId: getAssetSignedUrl
+      parameters:
+        - $ref: '#/components/parameters/assetId'
+      responses:
+        '200':
+          description: Signed asset media URL
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [url, expires_at]
+                properties:
+                  url:
+                    type: string
+                  expires_at:
+                    type: string
+                    format: date-time
+  /v1/assets/{asset_id}/media:
+    get:
+      summary: Serve signed local asset media
+      operationId: getAssetMedia
+      parameters:
+        - $ref: '#/components/parameters/assetId'
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Asset media bytes
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+            audio/mpeg:
+              schema:
+                type: string
+                format: binary
+            audio/mp4:
+              schema:
+                type: string
+                format: binary
+            audio/wav:
+              schema:
+                type: string
+                format: binary
+            video/mp4:
+              schema:
+                type: string
+                format: binary
+            video/quicktime:
+              schema:
+                type: string
+                format: binary
+            application/json:
+              schema:
+                type: string
+                format: binary
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
   /v1/assets/{asset_id}/consent:
     post:
       summary: Attach consent evidence to an asset

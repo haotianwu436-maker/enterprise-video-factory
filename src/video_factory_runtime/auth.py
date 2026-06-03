@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import binascii
 import hashlib
 import hmac
 import json
@@ -91,6 +92,27 @@ def create_artifact_access_token(
     return f"{signing_input}.{signature}"
 
 
+def create_asset_access_token(
+    *,
+    tenant_id: str,
+    asset_id: str,
+    secret: str | None = None,
+    ttl_seconds: int = 600,
+) -> str:
+    """Create a short-lived signed token for local asset previews."""
+    secret = secret or os.environ.get("VIDEO_FACTORY_JWT_SECRET", DEFAULT_SECRET)
+    header = {"alg": "HS256", "typ": "VF_ASSET"}
+    payload = {
+        "tenant_id": tenant_id,
+        "asset_id": asset_id,
+        "iat": int(time.time()),
+        "exp": int(time.time()) + ttl_seconds,
+    }
+    signing_input = f"{_b64_json(header)}.{_b64_json(payload)}"
+    signature = _b64(hmac.new(secret.encode(), signing_input.encode(), hashlib.sha256).digest())
+    return f"{signing_input}.{signature}"
+
+
 def verify_access_token(token: str, *, secret: str | None = None) -> ActorContext:
     """Verify a bearer token and return the actor context."""
     secret = secret or os.environ.get("VIDEO_FACTORY_JWT_SECRET", DEFAULT_SECRET)
@@ -114,14 +136,39 @@ def verify_access_token(token: str, *, secret: str | None = None) -> ActorContex
 
 def verify_artifact_access_token(token: str, *, secret: str | None = None) -> dict[str, str]:
     """Verify a short-lived artifact media token."""
-    payload = _verify_signed_payload(token, secret=secret)
+    payload = _verify_signed_payload(
+        token,
+        secret=secret,
+        expected_type="VF_ARTIFACT",
+        required_claims=("tenant_id", "artifact_id"),
+    )
     return {
         "tenant_id": str(payload["tenant_id"]),
         "artifact_id": str(payload["artifact_id"]),
     }
 
 
-def _verify_signed_payload(token: str, *, secret: str | None = None) -> dict[str, Any]:
+def verify_asset_access_token(token: str, *, secret: str | None = None) -> dict[str, str]:
+    """Verify a short-lived asset preview token."""
+    payload = _verify_signed_payload(
+        token,
+        secret=secret,
+        expected_type="VF_ASSET",
+        required_claims=("tenant_id", "asset_id"),
+    )
+    return {
+        "tenant_id": str(payload["tenant_id"]),
+        "asset_id": str(payload["asset_id"]),
+    }
+
+
+def _verify_signed_payload(
+    token: str,
+    *,
+    secret: str | None = None,
+    expected_type: str,
+    required_claims: tuple[str, ...],
+) -> dict[str, Any]:
     secret = secret or os.environ.get("VIDEO_FACTORY_JWT_SECRET", DEFAULT_SECRET)
     try:
         header_b64, payload_b64, signature = token.split(".", 2)
@@ -131,9 +178,18 @@ def _verify_signed_payload(token: str, *, secret: str | None = None) -> dict[str
     expected = _b64(hmac.new(secret.encode(), signing_input.encode(), hashlib.sha256).digest())
     if not hmac.compare_digest(signature, expected):
         raise AuthError("invalid token signature")
-    payload = _unb64_json(payload_b64)
+    try:
+        header = _unb64_json(header_b64)
+        payload = _unb64_json(payload_b64)
+    except (binascii.Error, UnicodeDecodeError, ValueError, json.JSONDecodeError) as exc:
+        raise AuthError("malformed token payload") from exc
+    if header.get("typ") != expected_type:
+        raise AuthError("token type mismatch")
     if int(payload.get("exp", 0)) < int(time.time()):
         raise AuthError("token expired")
+    missing_claims = [claim for claim in required_claims if not payload.get(claim)]
+    if missing_claims:
+        raise AuthError("token is missing required claims")
     return payload
 
 

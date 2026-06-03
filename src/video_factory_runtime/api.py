@@ -18,8 +18,10 @@ from video_factory_contracts.vocabulary import load_contract_vocabulary
 from video_factory_runtime.auth import (
     AuthError,
     create_access_token,
+    create_asset_access_token,
     create_artifact_access_token,
     verify_access_token,
+    verify_asset_access_token,
     verify_artifact_access_token,
     verify_password,
 )
@@ -134,6 +136,33 @@ def create_app(
             raise HTTPException(status_code=404, detail="asset not found") from exc
         except ValueError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.get("/v1/assets/{asset_id}/signed-url")
+    def get_asset_signed_url(asset_id: str, actor: ActorContext = Depends(actor_dep)) -> dict[str, str]:
+        asset = _get_asset_with_media(runtime_store, actor.tenant_id, asset_id)
+        file_path = _safe_runtime_file(str(asset["file_uri"]))
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail="asset media file not found")
+        token = create_asset_access_token(tenant_id=actor.tenant_id, asset_id=asset_id)
+        expires_at = datetime.now(timezone.utc) + timedelta(seconds=600)
+        return {
+            "url": f"/v1/assets/{asset_id}/media?token={token}",
+            "expires_at": expires_at.isoformat(),
+        }
+
+    @app.get("/v1/assets/{asset_id}/media")
+    def get_asset_media(asset_id: str, token: str = Query(...)) -> FileResponse:
+        try:
+            claims = verify_asset_access_token(token)
+        except AuthError as exc:
+            raise HTTPException(status_code=401, detail=str(exc)) from exc
+        if claims["asset_id"] != asset_id:
+            raise HTTPException(status_code=403, detail="asset token subject mismatch")
+        asset = _get_asset_with_media(runtime_store, claims["tenant_id"], asset_id)
+        file_path = _safe_runtime_file(str(asset["file_uri"]))
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail="asset media file not found")
+        return FileResponse(file_path, media_type=_asset_media_type(file_path))
 
     @app.post("/v1/jobs", status_code=status.HTTP_202_ACCEPTED)
     def create_job(
@@ -284,9 +313,35 @@ def _write_base64_file(tenant_id: str, payload: dict[str, Any]) -> str:
     return str(target)
 
 
+def _get_asset_with_media(store: SQLiteRuntimeStore, tenant_id: str, asset_id: str) -> dict[str, Any]:
+    asset = next((item for item in store.list_assets(tenant_id) if item["asset_id"] == asset_id), None)
+    if not asset or not asset.get("file_uri"):
+        raise HTTPException(status_code=404, detail="asset media not found")
+    return asset
+
+
+def _asset_media_type(file_path: Path) -> str:
+    suffix = file_path.suffix.lower()
+    if suffix in {".jpg", ".jpeg"}:
+        return "image/jpeg"
+    if suffix == ".png":
+        return "image/png"
+    if suffix == ".mp3":
+        return "audio/mpeg"
+    if suffix in {".m4a", ".mp4"}:
+        return "video/mp4" if suffix == ".mp4" else "audio/mp4"
+    if suffix == ".wav":
+        return "audio/wav"
+    if suffix == ".mov":
+        return "video/quicktime"
+    if suffix == ".json":
+        return "application/json"
+    return "application/octet-stream"
+
+
 def _safe_runtime_file(file_uri: str) -> Path:
     path = Path(file_uri).resolve()
     root = DEFAULT_DATA_DIR.resolve()
     if root not in path.parents and path != root:
-        raise HTTPException(status_code=403, detail="artifact path is outside runtime storage")
+        raise HTTPException(status_code=403, detail="runtime media path is outside local storage")
     return path

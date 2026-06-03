@@ -25,6 +25,7 @@ import {
 import {
   apiGet,
   apiPost,
+  buildAssetPreviewUrls,
   buildCreateJobPayload,
   fileToBase64,
   login,
@@ -49,6 +50,7 @@ type ViewState = {
   selectedJob: Job | null;
   artifacts: Artifact[];
   artifactMediaUrl: string;
+  assetPreviewUrls: Record<string, string>;
   qcReports: QcReport[];
 };
 
@@ -123,6 +125,7 @@ export function App() {
     selectedJob: null,
     artifacts: [],
     artifactMediaUrl: "",
+    assetPreviewUrls: {},
     qcReports: []
   });
   const [email, setEmail] = useState("creator@example.local");
@@ -145,7 +148,7 @@ export function App() {
   const completion = progressPercent(selectedJob);
   const activeAssets = useMemo(() => state.assets.filter((asset) => asset.state === "active"), [state.assets]);
   const activeByType = useMemo(
-    () => Object.fromEntries(activeAssets.map((asset) => [asset.asset_type, asset])),
+    () => firstActiveAssetByType(activeAssets),
     [activeAssets]
   );
   const latestQcMessage = state.qcReports[0]?.message ?? "";
@@ -187,6 +190,7 @@ export function App() {
         ])
       : [{ artifacts: [] }, { qc_reports: [] }];
     const mediaUrl = nextJob ? await artifactMediaUrl(artifacts.artifacts, token) : "";
+    const assetPreviewUrls = await buildAssetPreviewUrls(assets.assets, token);
     setState((current) => ({
       ...current,
       user: me,
@@ -195,6 +199,7 @@ export function App() {
       selectedJob: nextJob,
       artifacts: artifacts.artifacts,
       artifactMediaUrl: mediaUrl,
+      assetPreviewUrls,
       qcReports: qcReports.qc_reports
     }));
   }
@@ -534,7 +539,7 @@ export function App() {
             </div>
             <div className="asset-list">
               {activeAssets.length ? activeAssets.map((asset) => (
-                <span key={asset.asset_id}>{humanAssetType(asset.asset_type)} · {asset.display_name ?? asset.asset_id}</span>
+                <AssetCard key={asset.asset_id} asset={asset} previewUrl={state.assetPreviewUrls[asset.asset_id]} />
               )) : <p>还没有素材。可以先创建视频方案，后续再补声音和形象。</p>}
             </div>
           </section>
@@ -580,6 +585,23 @@ export function App() {
         </section>
       </section>
     </main>
+  );
+}
+
+function AssetCard({ asset, previewUrl }: { asset: Asset; previewUrl?: string }) {
+  const Icon = assetIconFor(asset.asset_type);
+  const hasPreview = Boolean(previewUrl);
+  return (
+    <article className="asset-card">
+      <div className={hasPreview ? "asset-thumb has-preview" : "asset-thumb"}>
+        {hasPreview ? <img src={previewUrl} alt="" /> : <Icon size={20} />}
+      </div>
+      <div className="asset-meta">
+        <strong>{asset.display_name ?? asset.asset_id}</strong>
+        <small>{humanAssetType(asset.asset_type)} · {asset.file_uri ? "本地文件已保存" : "系统默认素材"}</small>
+      </div>
+      <span className="asset-badge">可用</span>
+    </article>
   );
 }
 
@@ -659,6 +681,19 @@ function shortId(id: string) {
 
 function humanAssetType(type: string) {
   return assetOptions.find((option) => option.value === type)?.label ?? type;
+}
+
+function assetIconFor(type: string) {
+  return assetOptions.find((option) => option.value === type)?.icon ?? Library;
+}
+
+function firstActiveAssetByType(assets: Asset[]) {
+  return assets.reduce<Record<string, Asset>>((selected, asset) => {
+    if (!selected[asset.asset_type]) {
+      selected[asset.asset_type] = asset;
+    }
+    return selected;
+  }, {});
 }
 
 function humanQcMessage(report: QcReport) {

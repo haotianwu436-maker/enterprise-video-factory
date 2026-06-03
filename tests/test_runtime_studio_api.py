@@ -5,6 +5,7 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
+from video_factory_runtime.auth import create_asset_access_token, create_artifact_access_token
 from video_factory_runtime.api import create_app
 from video_factory_runtime.pipeline import CosyVoiceAdapter, GenerationPipeline
 from video_factory_runtime.storage import SQLiteRuntimeStore
@@ -157,6 +158,61 @@ def test_asset_upload_rejects_unsupported_extension(tmp_path) -> None:
     assert response.status_code == 422
 
 
+def test_asset_signed_url_serves_uploaded_image(tmp_path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    store = SQLiteRuntimeStore(tmp_path / "runtime.sqlite3")
+    client = TestClient(create_app(store=store))
+    login = client.post("/v1/auth/login", json={"email": "creator@example.local", "password": "factory-demo"})
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+    image_bytes = b"\xff\xd8real-local-image\xff\xd9"
+
+    asset = client.post(
+        "/v1/assets",
+        headers=headers,
+        json={
+            "asset_type": "avatar_profile",
+            "display_name": "Uploaded portrait",
+            "file_name": "portrait.jpg",
+            "content_base64": base64.b64encode(image_bytes).decode(),
+        },
+    )
+    assert asset.status_code == 201
+    asset_id = asset.json()["asset_id"]
+    assert asset.json()["file_uri"].endswith("portrait.jpg")
+
+    consent = client.post(
+        f"/v1/assets/{asset_id}/consent",
+        headers=headers,
+        json={
+            "scope": {"asset_id": asset_id, "purpose": "local preview"},
+            "evidence_uri": "local://test-consent/portrait.jpg",
+        },
+    )
+    assert consent.status_code == 201
+    activated = client.post(f"/v1/assets/{asset_id}/activate", headers=headers)
+    assert activated.status_code == 200
+    assert activated.json()["file_uri"].endswith("portrait.jpg")
+
+    signed = client.get(f"/v1/assets/{asset_id}/signed-url", headers=headers)
+    assert signed.status_code == 200
+    media = client.get(signed.json()["url"])
+    assert media.status_code == 200
+    assert media.headers["content-type"].startswith("image/jpeg")
+    assert media.content == image_bytes
+
+    artifact_token = create_artifact_access_token(tenant_id="tenant_123", artifact_id="artifact_001")
+    wrong_family = client.get(f"/v1/assets/{asset_id}/media?token={artifact_token}")
+    assert wrong_family.status_code == 401
+
+    wrong_subject_token = create_asset_access_token(tenant_id="tenant_123", asset_id="avatar_profile_other")
+    wrong_subject = client.get(f"/v1/assets/{asset_id}/media?token={wrong_subject_token}")
+    assert wrong_subject.status_code == 403
+
+    expired_token = create_asset_access_token(tenant_id="tenant_123", asset_id=asset_id, ttl_seconds=-1)
+    expired = client.get(f"/v1/assets/{asset_id}/media?token={expired_token}")
+    assert expired.status_code == 401
+
+
 def test_copywriter_prompts_and_local_generation(tmp_path, monkeypatch) -> None:
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     store = SQLiteRuntimeStore(tmp_path / "runtime.sqlite3")
@@ -227,6 +283,14 @@ def test_artifact_signed_url_serves_runtime_media(tmp_path, monkeypatch) -> None
     media = client.get(signed.json()["url"])
     assert media.status_code == 200
     assert media.content == b"mp4-bytes"
+
+    asset_token = create_asset_access_token(tenant_id="tenant_123", asset_id="avatar_profile_001")
+    wrong_family = client.get(f"/v1/artifacts/{artifact['artifact_id']}/media?token={asset_token}")
+    assert wrong_family.status_code == 401
+
+    wrong_subject_token = create_artifact_access_token(tenant_id="tenant_123", artifact_id="artifact_other")
+    wrong_subject = client.get(f"/v1/artifacts/{artifact['artifact_id']}/media?token={wrong_subject_token}")
+    assert wrong_subject.status_code == 403
 
 
 def test_renderer_failure_records_qc(tmp_path) -> None:
