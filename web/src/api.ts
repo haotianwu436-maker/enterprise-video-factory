@@ -48,6 +48,43 @@ export type ArtifactSignedUrl = {
   expires_at: string;
 };
 
+export type CopywriterQuestion = {
+  id: string;
+  label: string;
+  prompt: string;
+  placeholder: string;
+  required: boolean;
+};
+
+export type CopywriterPrompts = {
+  questions: CopywriterQuestion[];
+  tone_options: string[];
+  duration_options_sec: number[];
+};
+
+export type CopywriterBrief = {
+  situation: string;
+  audience: string;
+  pain: string;
+  offer: string;
+  proof: string;
+  action: string;
+  tone: string;
+  duration_sec: number;
+};
+
+export type CopywriterResult = {
+  mode: string;
+  title: string;
+  hook: string;
+  script: string;
+  beats: string[];
+  caption: string;
+  hashtags: string[];
+  notes: string[];
+  provider_error?: string;
+};
+
 const API_BASE = "";
 export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 

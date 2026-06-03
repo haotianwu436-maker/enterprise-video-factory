@@ -32,6 +32,9 @@ import {
   type ArtifactSignedUrl,
   type Artifact,
   type Asset,
+  type CopywriterBrief,
+  type CopywriterPrompts,
+  type CopywriterResult,
   type Job,
   type QcReport,
   type User
@@ -55,6 +58,17 @@ type Choice = {
 };
 
 const initialText = "企业做短视频，不该把时间浪费在重复剪辑上，而应该把内容生产做成可复用的自动流程。";
+
+const initialCopyBrief: CopywriterBrief = {
+  situation: "我是做企业培训的，想讲为什么老板要重视短视频自动化。",
+  audience: "中小企业老板、运营负责人",
+  pain: "每天想发短视频，但写稿、拍摄、剪辑太耗时间",
+  offer: "一条观点就能自动生成完整口播视频",
+  proof: "过去一条视频要半天，现在可以十几分钟跑完整流程",
+  action: "评论“自动化”，我发你一份流程图",
+  tone: "专业可信",
+  duration_sec: 60
+};
 
 const toneChoices: Choice[] = [
   { value: "trusted", label: "专业可信" },
@@ -121,6 +135,10 @@ export function App() {
   const [assetName, setAssetName] = useState("我的授权素材");
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
+  const [copyPrompts, setCopyPrompts] = useState<CopywriterPrompts | null>(null);
+  const [copyBrief, setCopyBrief] = useState<CopywriterBrief>(initialCopyBrief);
+  const [generatedCopy, setGeneratedCopy] = useState<CopywriterResult | null>(null);
+  const [copyLoading, setCopyLoading] = useState(false);
 
   const bearer = state.token;
   const selectedJob = state.selectedJob ?? state.jobs[0] ?? null;
@@ -138,8 +156,20 @@ export function App() {
   const currentStage = selectedJob?.active_stage ?? "source_intake";
 
   useEffect(() => {
-    if (bearer) void refreshAll(bearer);
+    if (bearer) {
+      void refreshAll(bearer);
+      void loadCopywriterPrompts(bearer);
+    }
   }, [bearer]);
+
+  async function loadCopywriterPrompts(token = bearer) {
+    if (!token) return;
+    try {
+      setCopyPrompts(await apiGet<CopywriterPrompts>("/v1/copywriter/prompts", token));
+    } catch {
+      setCopyPrompts(null);
+    }
+  }
 
   async function refreshAll(token = bearer, preferredJobId?: string) {
     if (!token) return;
@@ -216,6 +246,25 @@ export function App() {
     setState((current) => ({ ...current, selectedJob: job }));
     setMessage("视频方案已准备好，可以开始生成。");
     await refreshAll(bearer, job.job_id);
+  }
+
+  async function handleGenerateCopy() {
+    if (!bearer || !copyBrief.situation.trim()) return;
+    setCopyLoading(true);
+    try {
+      const result = await apiPost<CopywriterResult>("/v1/copywriter/generate", bearer, copyBrief);
+      setGeneratedCopy(result);
+      setIdea(result.script);
+      setMessage(result.mode === "openai" ? "AI 已生成可用口播文案。" : "已生成本地爆款文案草稿。");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "文案生成失败");
+    } finally {
+      setCopyLoading(false);
+    }
+  }
+
+  function updateBrief<K extends keyof CopywriterBrief>(key: K, value: CopywriterBrief[K]) {
+    setCopyBrief((current) => ({ ...current, [key]: value }));
   }
 
   async function handleSelectJob(job: Job) {
@@ -295,10 +344,57 @@ export function App() {
             <div className="section-heading">
               <div className="icon-tile teal"><BookOpenText size={18} /></div>
               <div>
-                <h2>今天想讲什么？</h2>
-                <p>一句观点也可以，系统会自动扩成 60 秒竖屏口播。</p>
+                <h2>AI 帮你写爆款口播</h2>
+                <p>先说你的情况，系统会按问题引导，再生成可直接拍的视频文案。</p>
               </div>
             </div>
+
+            <div className="copywriter-card">
+              <div className="copywriter-title">
+                <Sparkles size={18} />
+                <div>
+                  <strong>爆款文案助手</strong>
+                  <small>{copyPrompts ? "按提示填写，越具体越好。" : "正在准备提示问题。"}</small>
+                </div>
+              </div>
+              <label className="brief-field full">
+                <span>{promptLabel(copyPrompts, "situation", "你的情况")}</span>
+                <textarea
+                  value={copyBrief.situation}
+                  placeholder={promptPlaceholder(copyPrompts, "situation")}
+                  onChange={(event) => updateBrief("situation", event.target.value)}
+                />
+              </label>
+              <div className="brief-grid">
+                <BriefInput prompts={copyPrompts} field="audience" label="你想打动谁" value={copyBrief.audience} onChange={(value) => updateBrief("audience", value)} />
+                <BriefInput prompts={copyPrompts} field="pain" label="他们的痛点" value={copyBrief.pain} onChange={(value) => updateBrief("pain", value)} />
+                <BriefInput prompts={copyPrompts} field="offer" label="你的观点或方案" value={copyBrief.offer} onChange={(value) => updateBrief("offer", value)} />
+                <BriefInput prompts={copyPrompts} field="proof" label="可信细节" value={copyBrief.proof} onChange={(value) => updateBrief("proof", value)} />
+                <BriefInput prompts={copyPrompts} field="action" label="希望观众做什么" value={copyBrief.action} onChange={(value) => updateBrief("action", value)} />
+                <label className="brief-field">
+                  <span>口播时长</span>
+                  <select value={copyBrief.duration_sec} onChange={(event) => updateBrief("duration_sec", Number(event.target.value))}>
+                    {(copyPrompts?.duration_options_sec ?? [30, 45, 60]).map((duration) => (
+                      <option key={duration} value={duration}>{duration} 秒</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <div className="copy-actions">
+                <button className="primary" onClick={handleGenerateCopy} disabled={copyLoading || !copyBrief.situation.trim()}>
+                  <Sparkles size={18} /> {copyLoading ? "正在生成文案" : "生成爆款文案"}
+                </button>
+                {generatedCopy && <span>{generatedCopy.mode === "openai" ? "云端 AI" : "本地文案引擎"}</span>}
+              </div>
+              {generatedCopy && (
+                <div className="copy-result">
+                  <strong>{generatedCopy.title}</strong>
+                  <p>{generatedCopy.hook}</p>
+                  <button className="ghost compact" onClick={() => setIdea(generatedCopy.script)}>填入口播稿</button>
+                </div>
+              )}
+            </div>
+
             <textarea
               className="idea-box"
               value={idea}
@@ -510,6 +606,35 @@ function OptionPicker({ title, icon, choices, value, onChange }: { title: string
       </div>
     </div>
   );
+}
+
+function BriefInput({
+  prompts,
+  field,
+  label,
+  value,
+  onChange
+}: {
+  prompts: CopywriterPrompts | null;
+  field: keyof CopywriterBrief;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="brief-field">
+      <span>{promptLabel(prompts, field, label)}</span>
+      <input value={value} placeholder={promptPlaceholder(prompts, field)} onChange={(event) => onChange(event.target.value)} />
+    </label>
+  );
+}
+
+function promptLabel(prompts: CopywriterPrompts | null, id: string, fallback: string) {
+  return prompts?.questions.find((question) => question.id === id)?.label ?? fallback;
+}
+
+function promptPlaceholder(prompts: CopywriterPrompts | null, id: string) {
+  return prompts?.questions.find((question) => question.id === id)?.placeholder ?? "";
 }
 
 function ReadinessItem({ ok, title, detail, warning = false }: { ok: boolean; title: string; detail: string; warning?: boolean }) {

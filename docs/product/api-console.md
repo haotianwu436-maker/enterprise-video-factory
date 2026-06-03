@@ -47,6 +47,9 @@ Draft endpoints:
 POST   /v1/auth/login
 GET    /v1/auth/me
 
+GET    /v1/copywriter/prompts
+POST   /v1/copywriter/generate
+
 GET    /v1/jobs
 POST   /v1/jobs
 GET    /v1/jobs/{job_id}
@@ -75,6 +78,31 @@ GET    /v1/audit/events
 ```
 
 TASK-012 local runtime implements the Studio-facing subset above: auth, asset list/create/consent/activate, job create/list/detail/start, artifacts, and QC evidence. Later runtime tasks will attach the remaining review, repair, release, signed URL, and audit endpoints to the same contract.
+
+## Copywriter API
+
+The commercial Studio starts with guided copywriting before job creation. This keeps nontechnical users away from a blank script box.
+
+`GET /v1/copywriter/prompts` returns the question set shown in the Studio:
+
+- user situation
+- target audience
+- audience pain
+- core offer or viewpoint
+- proof or credibility detail
+- desired viewer action
+
+`POST /v1/copywriter/generate` accepts those answers and returns:
+
+- `title`
+- first-three-seconds `hook`
+- complete talking-head `script`
+- suggested `beats`
+- publish `caption`
+- `hashtags`
+- creator-facing `notes`
+
+When `OPENAI_API_KEY` is configured, the runtime calls the OpenAI Responses API through the copywriter adapter. Without that key, the endpoint returns `mode=local_template` and clearly labels the result as a local draft instead of pretending cloud AI was used.
 
 ## Create Job Request
 

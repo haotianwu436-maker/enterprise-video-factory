@@ -277,6 +277,108 @@ small { color: #94a3b8; display: block; margin-top: 12px; }
   background: #111827;
 }
 
+.copywriter-card {
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid rgba(20, 184, 166, .34);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(20, 184, 166, .1), rgba(17, 24, 39, .72)),
+    #111827;
+}
+
+.copywriter-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: #f8fafc;
+}
+
+.copywriter-title svg {
+  color: #5eead4;
+  margin-top: 2px;
+}
+
+.copywriter-title strong {
+  display: block;
+  font-size: 17px;
+}
+
+.copywriter-title small {
+  margin-top: 3px;
+}
+
+.brief-field {
+  margin: 0;
+  gap: 7px;
+}
+
+.brief-field span {
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.brief-field textarea {
+  min-height: 92px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.brief-field.full {
+  margin-bottom: 10px;
+}
+
+.brief-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.copy-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.copy-actions span {
+  padding: 7px 10px;
+  border-radius: 8px;
+  color: #99f6e4;
+  background: rgba(20, 184, 166, .12);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.copy-result {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  background: #0f172a;
+}
+
+.copy-result strong {
+  display: block;
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.copy-result p {
+  margin: 7px 0 10px;
+  color: #cbd5e1;
+  line-height: 1.45;
+}
+
+.compact {
+  width: auto;
+  min-height: 36px;
+  padding: 0 12px;
+}
+
 .choice-group {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -717,6 +819,7 @@ small { color: #94a3b8; display: block; margin-top: 12px; }
   .brand-lockup { align-items: flex-start; }
   .product-topbar h1 { font-size: 32px; }
   .workflow-strip, .choice-group, .settings-grid, .asset-type-grid { grid-template-columns: 1fr; }
+  .brief-grid { grid-template-columns: 1fr; }
   .creation-panel, .readiness-panel, .asset-studio, .job-history, .phone-preview-area { padding: 14px; }
   .action-row .primary, .action-row .secondary { width: 100%; }
 }

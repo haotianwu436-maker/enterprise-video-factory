@@ -23,6 +23,7 @@ from video_factory_runtime.auth import (
     verify_artifact_access_token,
     verify_password,
 )
+from video_factory_runtime.copywriter import CopywriterService
 from video_factory_runtime.domain import ActorContext, JobIntakeRejected
 from video_factory_runtime.pipeline import GenerationPipeline
 from video_factory_runtime.service import JobIntakeService
@@ -51,6 +52,7 @@ def create_app(
     app.state.runtime_store = runtime_store
     app.state.job_intake_service = intake_service
     app.state.pipeline = GenerationPipeline(runtime_store)
+    app.state.copywriter = CopywriterService()
     app.state.contract_vocabulary = load_contract_vocabulary()
     legacy_headers_enabled = (
         service is not None and store is None
@@ -175,6 +177,23 @@ def create_app(
     @app.get("/v1/jobs/{job_id}/qc")
     def list_job_qc(job_id: str, actor: ActorContext = Depends(actor_dep)) -> dict[str, Any]:
         return {"qc_reports": runtime_store.list_qc_reports(actor.tenant_id, job_id)}
+
+    @app.get("/v1/copywriter/prompts")
+    def get_copywriter_prompts(actor: ActorContext = Depends(actor_dep)) -> dict[str, Any]:
+        _require_role(actor, {"creator", "tenant_admin"})
+        return app.state.copywriter.prompts()
+
+    @app.post("/v1/copywriter/generate")
+    def generate_copy(
+        payload: dict[str, Any] = Body(...),
+        actor: ActorContext = Depends(actor_dep),
+    ) -> dict[str, Any]:
+        _require_role(actor, {"creator", "tenant_admin"})
+        try:
+            result = app.state.copywriter.generate(payload)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return result.to_api()
 
     @app.get("/v1/artifacts/{artifact_id}/signed-url")
     def get_artifact_signed_url(artifact_id: str, actor: ActorContext = Depends(actor_dep)) -> dict[str, str]:

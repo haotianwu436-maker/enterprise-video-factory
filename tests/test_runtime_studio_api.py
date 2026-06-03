@@ -157,6 +157,51 @@ def test_asset_upload_rejects_unsupported_extension(tmp_path) -> None:
     assert response.status_code == 422
 
 
+def test_copywriter_prompts_and_local_generation(tmp_path, monkeypatch) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    store = SQLiteRuntimeStore(tmp_path / "runtime.sqlite3")
+    client = TestClient(create_app(store=store))
+    login = client.post("/v1/auth/login", json={"email": "creator@example.local", "password": "factory-demo"})
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+    prompts = client.get("/v1/copywriter/prompts", headers=headers)
+    assert prompts.status_code == 200
+    assert any(item["id"] == "situation" for item in prompts.json()["questions"])
+
+    generated = client.post(
+        "/v1/copywriter/generate",
+        headers=headers,
+        json={
+            "situation": "我是做企业培训的，想讲为什么老板要重视短视频自动化。",
+            "audience": "中小企业老板",
+            "pain": "每天想发短视频，但写稿、拍摄、剪辑太耗时间",
+            "offer": "一条观点自动生成口播视频",
+            "proof": "过去一条视频要半天，现在可以十几分钟跑完整流程",
+            "action": "评论自动化，我发你流程图",
+            "tone": "专业可信",
+            "duration_sec": 60,
+        },
+    )
+
+    assert generated.status_code == 200
+    body = generated.json()
+    assert body["mode"] == "local_template"
+    assert "中小企业老板" in body["hook"]
+    assert "评论自动化" in body["script"]
+    assert body["hashtags"]
+
+
+def test_copywriter_requires_situation(tmp_path) -> None:
+    store = SQLiteRuntimeStore(tmp_path / "runtime.sqlite3")
+    client = TestClient(create_app(store=store))
+    login = client.post("/v1/auth/login", json={"email": "creator@example.local", "password": "factory-demo"})
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+    response = client.post("/v1/copywriter/generate", headers=headers, json={"audience": "老板"})
+
+    assert response.status_code == 422
+
+
 def test_artifact_signed_url_serves_runtime_media(tmp_path, monkeypatch) -> None:
     monkeypatch.chdir(Path(__file__).resolve().parents[1])
     store = SQLiteRuntimeStore(tmp_path / "runtime.sqlite3")

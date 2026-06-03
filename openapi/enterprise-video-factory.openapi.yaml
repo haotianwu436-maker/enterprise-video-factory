@@ -37,6 +37,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+  /v1/copywriter/prompts:
+    get:
+      summary: Get guided copywriting prompts
+      operationId: getCopywriterPrompts
+      responses:
+        '200':
+          description: Prompt questions for nontechnical creators
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CopywriterPrompts'
+  /v1/copywriter/generate:
+    post:
+      summary: Generate social-ready talking-head copy
+      operationId: generateCopywriterScript
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CopywriterGenerateRequest'
+      responses:
+        '200':
+          description: Generated copywriting result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CopywriterResult'
   /v1/jobs:
     get:
       summary: List video generation jobs
@@ -474,6 +502,85 @@ components:
           format: email
         role:
           enum: [creator, tenant_admin, reviewer, auditor]
+    CopywriterQuestion:
+      type: object
+      required: [id, label, prompt, placeholder, required]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        prompt:
+          type: string
+        placeholder:
+          type: string
+        required:
+          type: boolean
+    CopywriterPrompts:
+      type: object
+      required: [questions, tone_options, duration_options_sec]
+      properties:
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CopywriterQuestion'
+        tone_options:
+          type: array
+          items:
+            type: string
+        duration_options_sec:
+          type: array
+          items:
+            type: integer
+    CopywriterGenerateRequest:
+      type: object
+      required: [situation]
+      properties:
+        situation:
+          type: string
+        audience:
+          type: string
+        pain:
+          type: string
+        offer:
+          type: string
+        proof:
+          type: string
+        action:
+          type: string
+        tone:
+          type: string
+        duration_sec:
+          type: integer
+          enum: [30, 45, 60]
+    CopywriterResult:
+      type: object
+      required: [mode, title, hook, script, beats, caption, hashtags, notes]
+      properties:
+        mode:
+          enum: [openai, local_template, openai_failed_local_fallback]
+        title:
+          type: string
+        hook:
+          type: string
+        script:
+          type: string
+        beats:
+          type: array
+          items:
+            type: string
+        caption:
+          type: string
+        hashtags:
+          type: array
+          items:
+            type: string
+        notes:
+          type: array
+          items:
+            type: string
+        provider_error:
+          type: string
     JobState:
       type: string
       enum: [created, validated, planning, planned, segmenting, generating_audio, generating_avatar, rendering_scenes, aligning_subtitles, mixing_audio, composing, quality_checking, repairing, review_required, publish_ready, failed, cancelled]
